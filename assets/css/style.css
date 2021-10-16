@@ -42,7 +42,7 @@ html {
 
 .dashboard {
   padding: 16px 16px 14px;
-  background: url('musicPlayer/assets/images/themes/iu.jpg') top left / cover no-repeat;
+  background: url('./assets/images/themes/themeDashboar.jpg') top left / cover no-repeat;
   position: fixed;
   top: 0;
   width: 100%;
@@ -223,7 +223,7 @@ header h2 {
 }
 
 .song.active {
-  background: url('/assets/images/themes/player.png') center center no-repeat;
+  background: url('./assets/images/themes/themeSong.png') center center no-repeat;
 }
 
 .song:active {
