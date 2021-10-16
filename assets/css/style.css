@@ -42,7 +42,7 @@ html {
 
 .dashboard {
   padding: 16px 16px 14px;
-  background: url('/assets/images/themes/iu.jpg') top left / cover no-repeat;
+  background: url('musicPlayer/assets/images/themes/iu.jpg') top left / cover no-repeat;
   position: fixed;
   top: 0;
   width: 100%;
