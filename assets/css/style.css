@@ -42,7 +42,7 @@ html {
 
 .dashboard {
   padding: 16px 16px 14px;
-  background: url('/assets/images/closer.jpg') top left / cover no-repeat;
+  background: url('https://zmp3-static.zadn.vn/skins/zmp3-v6.1/images/theme-background/iu.jpg') top left / cover no-repeat;
   position: fixed;
   top: 0;
   width: 100%;
@@ -223,7 +223,7 @@ header h2 {
 }
 
 .song.active {
-  background: url('/assets/images/paris.jpg') center center no-repeat;
+  background: url('https://zmp3-static.zadn.vn/skins/zmp3-v6.1/images/theme-player/zma.png') center center no-repeat;
 }
 
 .song:active {
