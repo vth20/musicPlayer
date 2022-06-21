@@ -22,16 +22,46 @@ const playlist = $('.playlist')
 
 const app = {
     volumeCurrent: 0,
-    curentIndex: 0,
+    currentIndex: 0,
     isPlaying: false,
     isRandom: false,
     isRepeat: false,
     isMute: false,
     config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
+    arrayRandomSong: [],
+    handleArrayRandomSong: function() {
+        let newIndex
+        const check = () => {
+            if(
+                this.arrayRandomSong.includes(newIndex)
+                &&
+                this.arrayRandomSong.length <= this.songs.length
+                ||
+                newIndex === this.currentIndex
+            ){
+                if(this.arrayRandomSong.length == this.songs.length) {
+                    this.arrayRandomSong = []
+                }
+                return true;
+            }
+        }
+        do {
+            newIndex = Math.floor(Math.random() * this.songs.length)
+        } while (check())
+        this.arrayRandomSong.push(newIndex)
+        return newIndex
+    },
+
     setConfig: function(key, value) {
         this.config[key] = value;
         localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.config));
     },
+
+    setTitle: function() {
+        const title = `${this.songs[this.currentIndex].name} - ${this.songs[this.currentIndex].singer} | Bài hát, lyric`
+        document.title = title;
+    },
+
     loadConfig: function() {
         this.isRandom = (this.config.isRandom) || false;
         randomBtn.classList.toggle("active", this.isRandom)
@@ -39,7 +69,7 @@ const app = {
         this.isRepeat = (this.config.isRepeat) || false;
         repeatBtn.classList.toggle("active", this.isRepeat)
 
-        this.curentIndex = (this.config.currentIndex) || 0;
+        this.currentIndex = (this.config.currentIndex) || 0;
         this.volumeCurrent = (this.config.volumeCurrent) || 80;
     },
     songs: [
@@ -115,9 +145,10 @@ const app = {
         }
     ],
     render: function() {
+        this.setTitle()
         const htmls = this.songs.map((song, index) => {
             return `
-            <div class="song ${index === this.curentIndex ? "active" : ""}" data-index=${index}>
+            <div class="song ${index === this.currentIndex ? "active" : ""}" data-index=${index}>
                 <div class="thumb" style="background-image: url('${song.image}')">
                     <div class="gifAudio" style="background-image: url('./assets/images/icon/icon-playing.gif')"></div>
                 </div>
@@ -136,11 +167,11 @@ const app = {
     defineProperties: function() {
         Object.defineProperty(this, 'currentSong', {
             get: function() {
-                return this.songs[this.curentIndex]
+                return this.songs[this.currentIndex]
             }
         })
     },
-    handlEvents: function(){
+    handleEvents: function(){
         const _this = this
         const cdWidth = cd.offsetWidth
 
@@ -161,7 +192,7 @@ const app = {
             cdThumbAnimate.play()
 
             _this.gifPlaying()
-            _this.setConfig('currentIndex', _this.curentIndex);
+            _this.setConfig('currentIndex', _this.currentIndex);
         }
 
         audio.onpause = () => {
@@ -262,7 +293,7 @@ const app = {
             const optionNode = e.target.closest('.option');
             if(songNode || optionNode) {
                 if(songNode && !optionNode) {
-                    _this.curentIndex = Number.parseInt(songNode.dataset.index);
+                    _this.currentIndex = Number.parseInt(songNode.dataset.index);
                     _this.loadCurrentSong()
                     _this.render()
                     audio.play()
@@ -281,26 +312,26 @@ const app = {
         this.scrollActiveSong()
     },
     nextSong: function() {
-        this.curentIndex++
-        if(this.curentIndex >= this.songs.length) {
-            this.curentIndex = 0
+        this.currentIndex++
+        if(this.currentIndex >= this.songs.length) {
+            this.currentIndex = 0
         }
         this.loadCurrentSong()
     },
     prevSong: function() {
-        this.curentIndex--
-        if(this.curentIndex < 0) {
-            this.curentIndex = this.songs.length - 1
+        this.currentIndex--
+        if(this.currentIndex < 0) {
+            this.currentIndex = this.songs.length - 1
         }
         this.loadCurrentSong()
     },
     playRandomSong: function() {
-        let newIndex
-        do {
-            newIndex = Math.floor(Math.random() * this.songs.length)
-        } while (newIndex === this.curentIndex)
+        let newIndex = this.handleArrayRandomSong()
+        // do {
+        //     newIndex = Math.floor(Math.random() * this.songs.length)
+        // } while (newIndex === this.currentIndex)
 
-        this.curentIndex = newIndex
+        this.currentIndex = newIndex
         this.loadCurrentSong()
     },
     playRepeatSong: function() {
@@ -322,12 +353,12 @@ const app = {
         }
     },
     scrollActiveSong: function() {
-        const songIndex = this.curentIndex;
+        const songIndex = this.currentIndex;
         window.scrollTo(0, 200+songIndex*86)
     },
     gifPlaying: function() {
         const gif = $$('.gifAudio');
-        const index = this.curentIndex;
+        const index = this.currentIndex;
         (audio.paused) ? (gif[index].classList.remove('active')) : (gif[index].classList.add('active'))
     },
     timeAudio: function() {
@@ -336,19 +367,14 @@ const app = {
         const minutesCurrent = Math.floor(audio.currentTime / 60).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false})
         const secondsCurrent = Math.floor(audio.currentTime % 60).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false})
 
-        TIME_AUDIO.innerHTML = `${minutesCurrent}:${(secondsCurrent)} / ${this.songs[this.curentIndex].length}`
+        TIME_AUDIO.innerHTML = `${minutesCurrent}:${(secondsCurrent)} / ${this.songs[this.currentIndex].length}`
     },
     start: function() {
         this.loadConfig()
-
         this.volumeSetting()
-
         this.defineProperties()
-
-        this.handlEvents()
-
+        this.handleEvents()
         this.loadCurrentSong()
-
         this.render()
     }
 }
